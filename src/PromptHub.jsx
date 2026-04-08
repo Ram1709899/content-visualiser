@@ -42,12 +42,29 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
   });
 
   const promptTypes = [
-    { key: 'audio', label: 'Audio Generation', icon: <Radio size={18} />, color: '#FF6600' },
-    { key: 'script', label: 'Script Generation', icon: <PenTool size={18} />, color: '#00D1FF' },
-    { key: 'description', label: 'Metadata & Tags', icon: <MessageSquare size={18} />, color: '#9D50BB' },
-    { key: 'thumbnail', label: 'Thumbnail Concept', icon: <Edit3 size={18} />, color: '#FFD700' },
-    { key: 'shorts', label: 'Shorts Adaptation', icon: <Video size={18} />, color: '#FF00A8' }
+    { key: 'audio', label: 'Audio', icon: <Radio size={18} />, color: '#FF6600' },
+    { key: 'script', label: 'Script', icon: <PenTool size={18} />, color: '#00D1FF' },
+    { key: 'description', label: 'Metadata', icon: <MessageSquare size={18} />, color: '#9D50BB' },
+    { key: 'thumbnail', label: 'Thumbnail', icon: <Edit3 size={18} />, color: '#FFD700' },
+    { key: 'shorts', label: 'Shorts', icon: <Video size={18} />, color: '#FF00A8' }
   ];
+
+  const externalTools = [
+    { name: 'Audio Generation', service: 'Google AI Studio', url: 'https://aistudio.google.com/', icon: <Music size={18} />, color: '#FF6600' },
+    { name: 'Audio Generation', service: 'Decible.io', url: 'https://decible.io/', icon: <Radio size={18} />, color: '#FF6600' },
+    { name: 'Script Generation', service: 'ChatGPT', url: 'https://chat.openai.com/', icon: <MessageSquare size={18} />, color: '#00D1FF' },
+    { key: 'video', name: 'Video Compilation', service: 'Canva', url: 'https://www.canva.com/', icon: <Video size={18} />, color: '#FFD700' },
+    { name: 'Image Generation', service: 'Gemini', url: 'https://gemini.google.com/', icon: <Sparkles size={18} />, color: '#9D50BB' }
+  ];
+
+  const openInNewWindow = (e, url) => {
+    if (e) e.preventDefault();
+    const width = window.screen.availWidth;
+    const height = window.screen.availHeight;
+    const windowFeatures = `width=${width},height=${height},top=0,left=0,popup=yes,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes`;
+    window.open(url, `tool_${Date.now()}`, windowFeatures);
+  };
+
 
   useEffect(() => {
     if (channelData?.id) {
@@ -263,7 +280,20 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
 
   return (
     <div className="prompt-hub-container animate-fade">
-      <div className="dashboard-header" style={{ marginBottom: '1.5rem' }}>
+      <div className="external-tools-grid animate-fade">
+        {externalTools.map((tool, idx) => (
+          <div key={idx} className="external-tool-card" onClick={(e) => openInNewWindow(e, tool.url)}>
+            <div className="tool-card-icon" style={{ color: tool.color }}>{tool.icon}</div>
+            <div className="tool-card-info">
+              <div className="tool-card-name">{tool.name}</div>
+              <div className="tool-card-service">{tool.service}</div>
+            </div>
+            <div className="tool-card-link"><ExternalLink size={14} /></div>
+          </div>
+        ))}
+      </div>
+
+      <div className="dashboard-header" style={{ marginBottom: '1.5rem', marginTop: '1rem' }}>
         <div>
           <h1 className="main-title" style={{ marginBottom: '4px' }}>
             Neural Prompt Hub <span style={{ fontSize: '0.8rem', background: 'var(--primary)', color: 'white', padding: '2px 8px', borderRadius: '4px', marginLeft: '10px', verticalAlign: 'middle' }}>V2.0</span>
@@ -276,6 +306,24 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
           <button className="copy-btn" onClick={handleCreateNew} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Plus size={16} /> NEW ARCHIVE
           </button>
+        </div>
+      </div>
+
+      <div className="hub-tools-bar animate-fade">
+        <div className="tools-label"><Command size={14} /> SYSTEM TOOLS</div>
+        <div className="tools-divider"></div>
+        <div className="tools-list">
+          {promptTypes.map(type => (
+            <div
+              key={type.key}
+              className={`tool-item ${activePromptCategory === type.key ? 'active' : ''}`}
+              onClick={() => setActivePromptCategory(type.key)}
+              style={{ '--accent': type.color }}
+            >
+              {type.icon}
+              <span>{type.label}</span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -378,23 +426,6 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
                   </div>
 
                   <div className="professional-prompt-workspace">
-                    <div className="prompt-category-selector">
-                      {promptTypes.map(type => (
-                        <div
-                          key={type.key}
-                          className={`category-item ${activePromptCategory === type.key ? 'active' : ''}`}
-                          onClick={() => setActivePromptCategory(type.key)}
-                          style={{ '--accent': type.color }}
-                        >
-                          <div className="category-icon">{type.icon}</div>
-                          <div className="category-info">
-                            <span className="category-label">{type.label}</span>
-                            <span className="category-status">Establish Ready</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
                     <div className="prompt-display-area animate-fade" key={activePromptCategory}>
                       <div className="display-header">
                         <div className="display-title" style={{ color: promptTypes.find(t => t.key === activePromptCategory)?.color }}>
@@ -470,15 +501,72 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
         .viewer-info h2 { margin: 0 0 4px 0; font-family: 'Outfit'; font-size: 2rem; }
         .viewer-info .timestamp { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; letter-spacing: 1px; }
         
-        .professional-prompt-workspace { display: grid; grid-template-columns: 240px 1fr; gap: 1rem; background: rgba(0,0,0,0.2); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; height: 500px; }
-        .prompt-category-selector { background: rgba(255,255,255,0.02); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .category-item { padding: 1.25rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,102,0,0.05); }
-        .category-item:hover { background: rgba(255,255,255,0.05); }
-        .category-item.active { background: var(--glass); border-left: 4px solid var(--accent); }
-        .category-icon { color: var(--accent); }
-        .category-info { display: flex; flex-direction: column; }
-        .category-label { font-weight: 700; font-size: 0.85rem; color: var(--text-main); }
-        .category-status { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+        .external-tools-grid { 
+          display: grid; 
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+          gap: 15px; 
+          margin-bottom: 2rem; 
+        }
+        .external-tool-card { 
+          background: rgba(20, 20, 20, 0.8); 
+          border: 1px solid rgba(255, 255, 255, 0.05); 
+          border-radius: 12px; 
+          padding: 18px; 
+          display: flex; 
+          align-items: center; 
+          gap: 15px; 
+          cursor: pointer; 
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          position: relative;
+          overflow: hidden;
+        }
+        .external-tool-card:hover { 
+          background: rgba(30, 30, 30, 0.9); 
+          border-color: var(--primary); 
+          transform: translateY(-2px);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 20px rgba(255,102,0,0.1);
+        }
+        .tool-card-icon { 
+          display: flex; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 10px;
+        }
+        .tool-card-info { flex: 1; }
+        .tool-card-name { font-size: 0.85rem; font-weight: 800; color: white; margin-bottom: 2px; }
+        .tool-card-service { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+        .tool-card-link { color: var(--text-muted); opacity: 0.5; transition: all 0.2s; }
+        .external-tool-card:hover .tool-card-link { opacity: 1; color: var(--primary); }
+
+        .hub-tools-bar { 
+          display: flex; align-items: center; 
+          background: var(--card-bg); 
+          border: 1px solid var(--border); 
+          border-radius: 16px; 
+          padding: 8px 1.5rem; 
+          margin-bottom: 1.5rem; 
+          gap: 20px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .tools-label { font-size: 0.65rem; font-weight: 900; color: var(--text-muted); display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .tools-divider { width: 1px; height: 20px; background: var(--border); }
+        .tools-list { display: flex; gap: 8px; flex: 1; overflow-x: auto; }
+        .tool-item { 
+          display: flex; align-items: center; gap: 8px; 
+          padding: 8px 16px; border-radius: 10px; 
+          cursor: pointer; transition: all 0.2s; 
+          font-weight: 700; font-size: 0.8rem; 
+          color: var(--text-muted); border: 1px solid transparent; 
+          white-space: nowrap;
+        }
+        .tool-item:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+        .tool-item.active { 
+          background: rgba(255,102,0,0.05); 
+          border-color: rgba(255,102,0,0.2); 
+          color: var(--accent); 
+          box-shadow: 0 0 15px rgba(255,102,0,0.1); 
+        }
+        .tool-item svg { width: 16px; height: 16px; }
+
+        .professional-prompt-workspace { background: rgba(0,0,0,0.2); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; height: 500px; display: flex; flex-direction: column; }
+        
         
         .prompt-display-area { display: flex; flex-direction: column; overflow: hidden; }
         .display-header { padding: 1.25rem 2rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); }
