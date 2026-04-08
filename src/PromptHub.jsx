@@ -64,10 +64,30 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
 
       if (error) throw error;
 
-      setVersions(data || []);
+      const allVersions = data || [];
+      const active = allVersions.find(v => v.is_active);
 
-      const active = data?.find(v => v.is_active);
-      if (active) {
+      const virtualVersion = {
+        id: 'live-system',
+        name: 'Active System Configuration (Live)',
+        audio: channelData.audio || '',
+        script: channelData.script || '',
+        description: channelData.description || '',
+        thumbnail: channelData.thumbnail || '',
+        shorts: channelData.shorts || '',
+        is_active: !active,
+        created_at: new Date().toISOString(),
+        is_virtual: true
+      };
+
+      if (!active) {
+        // If nothing is active in DB, add the virtual one to the list and select it
+        setVersions([virtualVersion, ...allVersions]);
+        setSelectedVersionId('live-system');
+        setEditForm(virtualVersion);
+      } else {
+        // If something is active, just show the DB versions
+        setVersions(allVersions);
         setSelectedVersionId(active.id);
         setEditForm({
           name: active.name,
@@ -77,28 +97,6 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
           thumbnail: active.thumbnail,
           shorts: active.shorts
         });
-      } else {
-        // Fallback: Use the data passed from the channels table (the current existing prompts)
-        const virtualVersion = {
-          id: 'live-system',
-          name: 'Active System Configuration',
-          audio: channelData.audio || '',
-          script: channelData.script || '',
-          description: channelData.description || '',
-          thumbnail: channelData.thumbnail || '',
-          shorts: channelData.shorts || '',
-          is_active: true,
-          created_at: new Date().toISOString(),
-          is_virtual: true
-        };
-
-        // Add to versions if it's empty to show it in sidebar
-        if (!data || data.length === 0) {
-          setVersions([virtualVersion]);
-        }
-
-        setSelectedVersionId('live-system');
-        setEditForm(virtualVersion);
       }
     } catch (err) {
       console.error('Error fetching versions:', err);
