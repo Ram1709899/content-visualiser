@@ -407,7 +407,7 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
         .hub-status-toast.error { background: rgba(239, 68, 68, 0.9); color: white; }
         .hub-status-toast.info { background: rgba(59, 130, 246, 0.9); color: white; }
         .hub-status-toast.warning { background: rgba(245, 158, 11, 0.9); color: white; }
-      `}}</style>
+      `}} />
     </div>
   );
 };
