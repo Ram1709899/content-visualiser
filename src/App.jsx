@@ -421,12 +421,14 @@ const App = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-      const { data: list, error } = await supabase
+  const fetchChannels = async () => {
+    try {
+      const { data: list, error: fetchError } = await supabase
         .from('channels')
         .select('id, name')
         .order('name');
 
-      if (error) throw error;
+      if (fetchError) throw fetchError;
 
       setChannels(list);
       if (list.length > 0) {
