@@ -707,6 +707,15 @@ const App = () => {
                 <span>Security</span>
               </div>
 
+              <div
+                className={`nav-item ${view === 'prompts' ? 'active' : ''}`}
+                onClick={() => setView('prompts')}
+                title="Prompt Hub"
+              >
+                <Sparkles size={18} />
+                <span>Prompt Hub</span>
+              </div>
+
               <div className="section-label" style={{ marginTop: '1.5rem' }}>Video Styles</div>
               {Object.entries(data.styles).map(([style, ideas]) => {
                 const completed = ideas.filter(i => i.completed).length;

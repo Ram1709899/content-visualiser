@@ -240,7 +240,9 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
     <div className="prompt-hub-container animate-fade">
       <div className="dashboard-header" style={{ marginBottom: '1.5rem' }}>
         <div>
-          <h1 className="main-title" style={{ marginBottom: '4px' }}>Neural Prompt Hub</h1>
+          <h1 className="main-title" style={{ marginBottom: '4px' }}>
+            Neural Prompt Hub <span style={{ fontSize: '0.8rem', background: 'var(--primary)', color: 'white', padding: '2px 8px', borderRadius: '4px', marginLeft: '10px', verticalAlign: 'middle' }}>V2.0</span>
+          </h1>
           <p style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '0.9rem', letterSpacing: '1px' }}>
             MANAGE AI ARCHITECTURES AND VERSION HISTORY.
           </p>
