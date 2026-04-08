@@ -76,26 +76,28 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
           thumbnail: active.thumbnail,
           shorts: active.shorts
         });
-      } else if (data?.length > 0) {
-        setSelectedVersionId(data[0].id);
-        setEditForm({
-          name: data[0].name,
-          audio: data[0].audio,
-          script: data[0].script,
-          description: data[0].description,
-          thumbnail: data[0].thumbnail,
-          shorts: data[0].shorts
-        });
       } else {
-        // No versions found, create initial version from current channel data
-        setEditForm({
-          name: 'Legacy Version',
-          audio: channelData.audio_prompt || '',
-          script: channelData.script_prompt || '',
-          description: channelData.description_prompt || '',
-          thumbnail: channelData.thumbnail_prompt || '',
-          shorts: channelData.shorts_prompt || ''
-        });
+        // Fallback: Use the data passed from the channels table (the current existing prompts)
+        const virtualVersion = {
+          id: 'live-system',
+          name: 'Active System Configuration',
+          audio: channelData.audio || '',
+          script: channelData.script || '',
+          description: channelData.description || '',
+          thumbnail: channelData.thumbnail || '',
+          shorts: channelData.shorts || '',
+          is_active: true,
+          created_at: new Date().toISOString(),
+          is_virtual: true
+        };
+        
+        // Add to versions if it's empty to show it in sidebar
+        if (!data || data.length === 0) {
+          setVersions([virtualVersion]);
+        }
+        
+        setSelectedVersionId('live-system');
+        setEditForm(virtualVersion);
       }
     } catch (err) {
       console.error('Error fetching versions:', err);
@@ -324,16 +326,22 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
                 </div>
                 <div className="viewer-actions">
                   <button className="copy-btn" onClick={() => setIsEditing(true)}>
-                    <Edit3 size={16} /> EDIT VERSION
+                    <Edit3 size={16} /> CLONE TO NEW VERSION
                   </button>
-                  <button 
-                    className={`google-login-btn ${selectedVersion.is_active ? 'disabled' : ''}`} 
-                    style={{ height: '40px', padding: '0 20px' }}
-                    onClick={() => handleSetActive(selectedVersion.id)}
-                    disabled={selectedVersion.is_active || saving}
-                  >
-                    <Play size={16} /> {selectedVersion.is_active ? 'CURRENT WORKING' : 'DEPLOY AS WORKING'}
-                  </button>
+                  {selectedVersion.is_virtual ? (
+                    <div className="active-badge" style={{ position: 'static', padding: '8px 16px', fontSize: '0.8rem' }}>
+                      <Play size={14} /> LIVE SYSTEM ACTIVE
+                    </div>
+                  ) : (
+                    <button 
+                      className={`google-login-btn ${selectedVersion.is_active ? 'disabled' : ''}`} 
+                      style={{ height: '40px', padding: '0 20px' }}
+                      onClick={() => handleSetActive(selectedVersion.id)}
+                      disabled={selectedVersion.is_active || saving}
+                    >
+                      <Play size={16} /> {selectedVersion.is_active ? 'CURRENT WORKING' : 'DEPLOY AS WORKING'}
+                    </button>
+                  )}
                 </div>
               </div>
 
