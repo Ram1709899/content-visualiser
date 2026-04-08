@@ -406,6 +406,7 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
         
         .hub-main { min-height: 0; overflow-y: auto; }
         .editor-header, .viewer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding: 1.5rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; }
+        .viewer-actions { display: flex; align-items: center; gap: 15px; }
         .version-name-input { background: none; border: none; border-bottom: 2px solid var(--border); color: white; font-size: 1.5rem; font-weight: 800; font-family: 'Outfit'; width: 100%; max-width: 400px; padding: 8px 0; outline: none; transition: border-color 0.2s; }
         .version-name-input:focus { border-color: var(--primary); }
         
