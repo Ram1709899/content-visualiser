@@ -53,7 +53,7 @@ const Security = () => {
         </div>
       </div>
 
-      <div className="security-content">
+      <div className="security-content" style={{ marginTop: '3rem' }}>
         <div className="prompt-card big" style={{ maxWidth: '600px', margin: '0 auto' }}>
           <div className="prompt-label">
             <span><Lock size={16} /> Update Access Password</span>
