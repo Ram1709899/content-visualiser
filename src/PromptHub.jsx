@@ -30,6 +30,8 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
   const [status, setStatus] = useState({ type: '', message: '' });
   const [isEditing, setIsEditing] = useState(false);
   const [activePromptCategory, setActivePromptCategory] = useState('audio');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [editForm, setEditForm] = useState({
     name: '',
     audio: '',
@@ -226,6 +228,29 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!selectedVersionId || selectedVersionId === 'live-system') return;
+
+    try {
+      setIsDeleting(true);
+      const { error } = await supabase
+        .from('prompt_versions')
+        .delete()
+        .eq('id', selectedVersionId);
+
+      if (error) throw error;
+
+      setStatus({ type: 'success', message: '🗑️ VERSION PERMANENTLY DELETED' });
+      setShowDeleteModal(false);
+      fetchVersions();
+    } catch (err) {
+      setStatus({ type: 'error', message: `❌ DELETE FAILED: ${err.message}` });
+    } finally {
+      setIsDeleting(false);
+      setTimeout(() => setStatus({ type: '', message: '' }), 3000);
+    }
+  };
+
   const handleCopy = (text, label) => {
     navigator.clipboard.writeText(text);
     setStatus({ type: 'info', message: `📋 COPIED: ${label}` });
@@ -327,6 +352,11 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
                       <span className="timestamp">ARCHIVED ON {new Date(selectedVersion.created_at).toLocaleString()}</span>
                     </div>
                     <div className="viewer-actions">
+                      {!selectedVersion.is_virtual && !selectedVersion.is_active && (
+                        <button className="copy-btn" style={{ color: '#ef4444' }} onClick={() => setShowDeleteModal(true)}>
+                          <Trash2 size={16} /> DELETE
+                        </button>
+                      )}
                       <button className="copy-btn" onClick={() => setIsEditing(true)}>
                         <Edit3 size={16} /> CLONE TO NEW VERSION
                       </button>
@@ -394,6 +424,23 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
         </div>
       )}
 
+      {showDeleteModal && (
+        <div className="modal-overlay animate-fade">
+          <div className="delete-modal">
+            <div className="modal-icon"><AlertCircle size={48} color="#ef4444" /></div>
+            <h3>Critical Confirmation</h3>
+            <p>You are about to permanently purge this prompt architecture from the system.</p>
+            <div className="warning-box">THIS ACTION IS NOT REVERSIBLE.</div>
+            <div className="modal-footer">
+              <button className="copy-btn" onClick={() => setShowDeleteModal(false)}>CANCEL</button>
+              <button className="google-login-btn danger" style={{ background: '#ef4444' }} onClick={handleDelete} disabled={isDeleting}>
+                {isDeleting ? 'PURGING...' : 'CONFIRM PURGE'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style dangerouslySetInnerHTML={{
         __html: `
         .prompt-hub-container { height: 100%; display: flex; flex-direction: column; }
@@ -438,6 +485,14 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
         .display-title { font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
         .display-body { padding: 2rem; font-size: 1rem; line-height: 1.8; color: rgba(255,255,255,0.9); overflow-y: auto; flex: 1; font-family: 'Inter'; white-space: pre-wrap; }
         
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+        .delete-modal { background: var(--card-bg); border: 2px solid #ef444433; border-radius: 24px; padding: 2.5rem; width: 400px; text-align: center; box-shadow: 0 0 50px rgba(239, 68, 68, 0.1); }
+        .modal-icon { margin-bottom: 1.5rem; }
+        .delete-modal h3 { font-family: 'Outfit'; font-size: 1.5rem; margin-bottom: 1rem; color: #ef4444; }
+        .delete-modal p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem; }
+        .warning-box { background: rgba(239, 68, 68, 0.1); color: #ef4444; font-weight: 800; font-size: 0.75rem; letter-spacing: 1px; padding: 12px; border-radius: 8px; margin-bottom: 2rem; border: 1px dashed #ef444444; }
+        .modal-footer { display: flex; gap: 12px; justify-content: center; }
+
         .hub-status-toast { position: fixed; bottom: 30px; right: 30px; padding: 1rem 1.5rem; border-radius: 12px; display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 0.9rem; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
         .hub-status-toast.success { background: rgba(16, 185, 129, 0.9); color: white; }
         .hub-status-toast.error { background: rgba(239, 68, 68, 0.9); color: white; }
