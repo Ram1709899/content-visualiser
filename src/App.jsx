@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Copy, Layers, List, PenTool, Radio, ExternalLink, Command, ShieldCheck, AlignCenter, Brush, Music, MessageSquare, Video, ChevronLeft, ChevronRight, ChevronDown, Sparkles, Calendar, LayoutDashboard, Activity, CheckCircle2, Clock, Globe, LogOut } from 'lucide-react';
 import { supabase } from './supabaseClient';
 import Login from './Login';
+import Security from './Security';
 
 
 const niceDate = (dateStr) => {
@@ -245,6 +246,19 @@ const Dashboard = ({ data, channels, onViewChange, onTitleClick }) => {
           <div className="hub-link-content">
             <div className="hub-link-title">Calendar</div>
             <div className="hub-link-desc">View deployment schedule</div>
+          </div>
+          <div className="hub-link-arrow">
+            <ChevronRight size={20} />
+          </div>
+        </div>
+
+        <div className="hub-link-card" onClick={() => onViewChange('security')}>
+          <div className="hub-link-icon-wrapper">
+            <ShieldCheck size={24} />
+          </div>
+          <div className="hub-link-content">
+            <div className="hub-link-title">Security</div>
+            <div className="hub-link-desc">Manage access password</div>
           </div>
           <div className="hub-link-arrow">
             <ChevronRight size={20} />
@@ -686,6 +700,15 @@ const App = () => {
                 <span>Pipeline</span>
               </div>
 
+              <div
+                className={`nav-item ${view === 'security' ? 'active' : ''}`}
+                onClick={() => setView('security')}
+                title="Security"
+              >
+                <ShieldCheck size={18} />
+                <span>Security</span>
+              </div>
+
               <div className="section-label" style={{ marginTop: '1.5rem' }}>Video Styles</div>
               {Object.entries(data.styles).map(([style, ideas]) => {
                 const completed = ideas.filter(i => i.completed).length;
@@ -732,6 +755,8 @@ const App = () => {
       <div className="main-content">
         {view === 'dashboard' ? (
           <Dashboard data={data} channels={channels} onViewChange={(v) => setView(v)} onTitleClick={setLinksIdea} />
+        ) : view === 'security' ? (
+          <Security />
         ) : view === 'prompts' ? (
           <div className="animate-fade">
             <div className="quick-links">
