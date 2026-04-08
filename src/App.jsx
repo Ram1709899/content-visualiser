@@ -701,15 +701,6 @@ const App = () => {
               </div>
 
               <div
-                className={`nav-item ${view === 'security' ? 'active' : ''}`}
-                onClick={() => setView('security')}
-                title="Security"
-              >
-                <ShieldCheck size={18} />
-                <span>Security</span>
-              </div>
-
-              <div
                 className={`nav-item ${view === 'prompts' ? 'active' : ''}`}
                 onClick={() => setView('prompts')}
                 title="Prompt Hub"
@@ -767,7 +758,7 @@ const App = () => {
         ) : view === 'security' ? (
           <Security />
         ) : view === 'prompts' ? (
-          <PromptHub 
+          <PromptHub
             channelData={{
               ...selectedChannel,
               ...data.prompts
