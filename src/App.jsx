@@ -3,6 +3,7 @@ import { Copy, Layers, List, PenTool, Radio, ExternalLink, Command, ShieldCheck,
 import { supabase } from './supabaseClient';
 import Login from './Login';
 import Security from './Security';
+import PromptHub from './PromptHub';
 
 
 const niceDate = (dateStr) => {
@@ -392,8 +393,8 @@ const App = () => {
   const [error, setError] = useState(null);
   const [copiedText, setCopiedText] = useState('');
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [channels, setChannels] = useState([]);
-  const [selectedChannel, setSelectedChannel] = useState('');
+  const [channels, setChannels] = useState([]); // [{id, name}]
+  const [selectedChannel, setSelectedChannel] = useState(null); // {id, name}
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [toastPos, setToastPos] = useState({ x: 0, y: 0 });
@@ -420,19 +421,16 @@ const App = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchChannels = async () => {
-    try {
       const { data: list, error } = await supabase
         .from('channels')
-        .select('name')
+        .select('id, name')
         .order('name');
 
       if (error) throw error;
 
-      const channelNames = list.map(c => c.name);
-      setChannels(channelNames);
-      if (channelNames.length > 0) {
-        setSelectedChannel(channelNames[0]);
+      setChannels(list);
+      if (list.length > 0) {
+        setSelectedChannel(list[0]);
       } else {
         setLoading(false);
         // Don't set error here, maybe user just hasn't migrated data yet
@@ -457,7 +455,7 @@ const App = () => {
 
   useEffect(() => {
     if (selectedChannel && session) {
-      fetchData(selectedChannel);
+      fetchData(selectedChannel.name);
     }
   }, [selectedChannel, session]);
 
@@ -530,7 +528,7 @@ const App = () => {
       if (error) throw error;
     } catch (err) {
       console.error('Failed to update status:', err);
-      fetchData(selectedChannel);
+      fetchData(selectedChannel.name);
     }
   };
 
@@ -550,7 +548,7 @@ const App = () => {
       if (error) throw error;
     } catch (err) {
       console.error('Failed to update date:', err);
-      fetchData(selectedChannel);
+      fetchData(selectedChannel.name);
     }
   };
 
@@ -570,7 +568,7 @@ const App = () => {
       if (error) throw error;
     } catch (err) {
       console.error('Failed to update links:', err);
-      fetchData(selectedChannel);
+      fetchData(selectedChannel.name);
     }
   };
 
@@ -652,8 +650,8 @@ const App = () => {
               setIsDropdownOpen(!isDropdownOpen);
             }}>
               <div className="dropdown-trigger">
-                <span className="current-value" style={{ fontFamily: `'${getFontForItem(channels.indexOf(selectedChannel))}', sans-serif` }}>
-                  {selectedChannel || 'Select Channel'}
+                <span className="current-value" style={{ fontFamily: `'${getFontForItem(channels.findIndex(c => c.id === selectedChannel?.id))}', sans-serif` }}>
+                  {selectedChannel?.name || 'Select Channel'}
                 </span>
                 <ChevronDown size={14} className={isDropdownOpen ? 'rotated' : ''} />
               </div>
@@ -661,15 +659,15 @@ const App = () => {
                 <div className="dropdown-options animate-fade">
                   {channels.map((c, idx) => (
                     <div
-                      key={c}
-                      className={`dropdown-option ${selectedChannel === c ? 'selected' : ''}`}
+                      key={c.id}
+                      className={`dropdown-option ${selectedChannel?.id === c.id ? 'selected' : ''}`}
                       style={{ fontFamily: `'${getFontForItem(idx)}', sans-serif` }}
                       onClick={() => {
                         setSelectedChannel(c);
                         setLoading(true);
                       }}
                     >
-                      {c}
+                      {c.name}
                     </div>
                   ))}
                 </div>
@@ -758,107 +756,13 @@ const App = () => {
         ) : view === 'security' ? (
           <Security />
         ) : view === 'prompts' ? (
-          <div className="animate-fade">
-            <div className="quick-links">
-              <a href="https://aistudio.google.com/generate-speech" onClick={(e) => openInNewWindow(e, 'https://aistudio.google.com/generate-speech')} className="quick-link-item audio">
-                <Music size={20} />
-                <div className="link-text">
-                  <span className="link-label">Audio Generation</span>
-                  <span className="link-url">Google AI Studio</span>
-                </div>
-                <ExternalLink size={14} className="ext-icon" />
-              </a>
-              <a href="https://www.decible.io/" onClick={(e) => openInNewWindow(e, 'https://www.decible.io/')} className="quick-link-item audio">
-                <Music size={20} />
-                <div className="link-text">
-                  <span className="link-label">Audio Generation</span>
-                  <span className="link-url">Decible.io</span>
-                </div>
-                <ExternalLink size={14} className="ext-icon" />
-              </a>
-              <a href="https://chatgpt.com/" onClick={(e) => openInNewWindow(e, 'https://chatgpt.com/')} className="quick-link-item script">
-                <MessageSquare size={20} />
-                <div className="link-text">
-                  <span className="link-label">Script Generation</span>
-                  <span className="link-url">ChatGPT</span>
-                </div>
-                <ExternalLink size={14} className="ext-icon" />
-              </a>
-              <a href="https://www.canva.com/" onClick={(e) => openInNewWindow(e, 'https://www.canva.com/')} className="quick-link-item video">
-                <Video size={20} />
-                <div className="link-text">
-                  <span className="link-label">Video Compilation</span>
-                  <span className="link-url">Canva</span>
-                </div>
-                <ExternalLink size={14} className="ext-icon" />
-              </a>
-              <a href="https://gemini.google.com/app" onClick={(e) => openInNewWindow(e, 'https://gemini.google.com/app')} className="quick-link-item image">
-                <Sparkles size={20} />
-                <div className="link-text">
-                  <span className="link-label">Image Generation</span>
-                  <span className="link-url">Gemini</span>
-                </div>
-                <ExternalLink size={14} className="ext-icon" />
-              </a>
-            </div>
-            <h2 className="main-title">YouTube Prompt Hub</h2>
-            <div className="prompts-grid">
-              {/* Audio Prompt Card */}
-              <div className="prompt-card big">
-                <div className="prompt-label">
-                  <span><Radio size={16} /> Audio Generation Prompt</span>
-                  <button className="copy-btn" onClick={(e) => handleCopy(e, data.prompts.audio, 'Audio Prompt')}>
-                    {copiedText === 'Audio Prompt' ? 'Copied!' : 'Copy Prompt'}
-                  </button>
-                </div>
-                <div className="prompt-value large">{data.prompts.audio}</div>
-              </div>
-
-              {/* Script Prompt Card */}
-              <div className="prompt-card big accent">
-                <div className="prompt-label">
-                  <span><PenTool size={16} /> Script Generation Prompt</span>
-                  <button className="copy-btn" onClick={(e) => handleCopy(e, data.prompts.script, 'Script Prompt')}>
-                    {copiedText === 'Script Prompt' ? 'Copied!' : 'Copy Prompt'}
-                  </button>
-                </div>
-                <div className="prompt-value large">{data.prompts.script}</div>
-              </div>
-
-              {/* Video Description Card */}
-              <div className="prompt-card big">
-                <div className="prompt-label">
-                  <span><AlignCenter size={16} /> Video Description Prompt</span>
-                  <button className="copy-btn" onClick={(e) => handleCopy(e, data.prompts.description, 'Description Prompt')}>
-                    {copiedText === 'Description Prompt' ? 'Copied!' : 'Copy Prompt'}
-                  </button>
-                </div>
-                <div className="prompt-value large">{data.prompts.description}</div>
-              </div>
-
-              {/* Thumbnail Generation Card */}
-              <div className="prompt-card big accent">
-                <div className="prompt-label">
-                  <span><Brush size={16} /> Thumbnail Prompt</span>
-                  <button className="copy-btn" onClick={(e) => handleCopy(e, data.prompts.thumbnail, 'Thumbnail Prompt')}>
-                    {copiedText === 'Thumbnail Prompt' ? 'Copied!' : 'Copy Prompt'}
-                  </button>
-                </div>
-                <div className="prompt-value large">{data.prompts.thumbnail}</div>
-              </div>
-
-              {/* Shorts Prompt Card */}
-              <div className="prompt-card big">
-                <div className="prompt-label">
-                  <span><Command size={16} /> Shorts Prompt Template</span>
-                  <button className="copy-btn" onClick={(e) => handleCopy(e, data.prompts.shorts, 'Shorts Prompt')}>
-                    {copiedText === 'Shorts Prompt' ? 'Copied!' : 'Copy Prompt'}
-                  </button>
-                </div>
-                <div className="prompt-value large">{data.prompts.shorts}</div>
-              </div>
-            </div>
-          </div>
+          <PromptHub 
+            channelData={{
+              ...selectedChannel,
+              ...data.prompts
+            }}
+            onUpdateActivePrompts={(newPrompts) => setData(prev => ({ ...prev, prompts: newPrompts }))}
+          />
         ) : view === 'calendar' ? (
           <BigCalendar
             data={data}
