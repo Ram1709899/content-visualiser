@@ -29,6 +29,7 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState({ type: '', message: '' });
   const [isEditing, setIsEditing] = useState(false);
+  const [activePromptCategory, setActivePromptCategory] = useState('audio');
   const [editForm, setEditForm] = useState({
     name: '',
     audio: '',
@@ -345,22 +346,38 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
                 </div>
               </div>
 
-              <div className="prompts-grid-professional">
-                {promptTypes.map(type => (
-                  <div key={type.key} className="prompt-card professional">
-                    <div className="prompt-header">
-                      <div className="type-badge" style={{ background: `${type.color}15`, color: type.color }}>
-                        {type.icon} {type.label}
+              <div className="professional-prompt-workspace">
+                <div className="prompt-category-selector">
+                  {promptTypes.map(type => (
+                    <div 
+                      key={type.key} 
+                      className={`category-item ${activePromptCategory === type.key ? 'active' : ''}`}
+                      onClick={() => setActivePromptCategory(type.key)}
+                      style={{ '--accent': type.color }}
+                    >
+                      <div className="category-icon">{type.icon}</div>
+                      <div className="category-info">
+                        <span className="category-label">{type.label}</span>
+                        <span className="category-status">Establish Ready</span>
                       </div>
-                      <button className="icon-action" onClick={() => handleCopy(selectedVersion[type.key], type.label)}>
-                        <Copy size={16} />
-                      </button>
                     </div>
-                    <div className="prompt-body-scrollable">
-                      {selectedVersion[type.key] || <span style={{ opacity: 0.3 }}>No data established.</span>}
+                  ))}
+                </div>
+
+                <div className="prompt-display-area animate-fade" key={activePromptCategory}>
+                  <div className="display-header">
+                    <div className="display-title" style={{ color: promptTypes.find(t => t.key === activePromptCategory)?.color }}>
+                      {promptTypes.find(t => t.key === activePromptCategory)?.icon}
+                      {promptTypes.find(t => t.key === activePromptCategory)?.label}
                     </div>
+                    <button className="copy-btn" onClick={() => handleCopy(selectedVersion[activePromptCategory], activePromptCategory)}>
+                      <Copy size={16} /> COPY TO CLIPBOARD
+                    </button>
                   </div>
-                ))}
+                  <div className="display-body">
+                    {selectedVersion[activePromptCategory] || <span style={{ opacity: 0.3 }}>No architectural data established for this category.</span>}
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -401,14 +418,20 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
         .viewer-info h2 { margin: 0 0 4px 0; font-family: 'Outfit'; font-size: 2rem; }
         .viewer-info .timestamp { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; letter-spacing: 1px; }
         
-        .prompts-grid-professional { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; }
-        .prompt-card.professional { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 0; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s; }
-        .prompt-card.professional:hover { transform: translateY(-5px); border-color: var(--primary); }
-        .prompt-header { padding: 1rem 1.5rem; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .type-badge { font-size: 0.75rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 6px 12px; border-radius: 8px; display: flex; align-items: center; gap: 8px; }
-        .icon-action { background: none; border: none; color: var(--text-muted); cursor: pointer; transition: color 0.2s; }
-        .icon-action:hover { color: var(--primary); }
-        .prompt-body-scrollable { padding: 1.5rem; font-size: 0.95rem; line-height: 1.6; color: rgba(255,255,255,0.8); max-height: 300px; overflow-y: auto; font-family: 'Inter'; }
+        .professional-prompt-workspace { display: grid; grid-template-columns: 240px 1fr; gap: 1rem; background: rgba(0,0,0,0.2); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; height: 500px; }
+        .prompt-category-selector { background: rgba(255,255,255,0.02); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .category-item { padding: 1.25rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,102,0,0.05); }
+        .category-item:hover { background: rgba(255,255,255,0.05); }
+        .category-item.active { background: var(--glass); border-left: 4px solid var(--accent); }
+        .category-icon { color: var(--accent); }
+        .category-info { display: flex; flex-direction: column; }
+        .category-label { font-weight: 700; font-size: 0.85rem; color: var(--text-main); }
+        .category-status { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+        
+        .prompt-display-area { display: flex; flex-direction: column; overflow: hidden; }
+        .display-header { padding: 1.25rem 2rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); }
+        .display-title { font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+        .display-body { padding: 2rem; font-size: 1rem; line-height: 1.8; color: rgba(255,255,255,0.9); overflow-y: auto; flex: 1; font-family: 'Inter'; white-space: pre-wrap; }
         
         .hub-status-toast { position: fixed; bottom: 30px; right: 30px; padding: 1rem 1.5rem; border-radius: 12px; display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 0.9rem; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
         .hub-status-toast.success { background: rgba(16, 185, 129, 0.9); color: white; }
