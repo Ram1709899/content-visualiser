@@ -1691,7 +1691,7 @@ tr:hover .shorts-copy-icon {
 .dashboard-hub-links {
   grid-area: hub-links;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   margin-bottom: 0.5rem;
 }
@@ -2161,7 +2161,8 @@ tr:hover .shorts-copy-icon {
   }
 
   .dashboard-hub-links {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
   }
 
   .prompts-grid {

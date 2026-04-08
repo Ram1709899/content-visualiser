@@ -59,7 +59,7 @@ const Dashboard = ({ data, channels, onViewChange, onTitleClick }) => {
     const start = new Date(firstBookedDate + 'T00:00:00');
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const diffTime = today - start;
     const daysSinceStart = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
@@ -71,16 +71,16 @@ const Dashboard = ({ data, channels, onViewChange, onTitleClick }) => {
     ];
 
     const nextMilestone = milestones.find(m => m.days > daysSinceStart);
-    
+
     if (nextMilestone) {
       const mDate = new Date(start);
       mDate.setDate(mDate.getDate() + nextMilestone.days);
-      
+
       const prevMilestoneIndex = milestones.indexOf(nextMilestone) - 1;
       const prevMilestone = milestones[prevMilestoneIndex];
       const prevLabel = prevMilestone?.label || 'Day 1';
       const prevDays = prevMilestone?.days || 0;
-      
+
       const pDate = new Date(start);
       pDate.setDate(pDate.getDate() + prevDays);
 
@@ -98,16 +98,16 @@ const Dashboard = ({ data, channels, onViewChange, onTitleClick }) => {
         percent
       };
     } else {
-        milestoneInfo = {
-            currentDays: daysSinceStart + 1,
-            completed: true
-        };
+      milestoneInfo = {
+        currentDays: daysSinceStart + 1,
+        completed: true
+      };
     }
   }
 
   // Metric Details Mapping
   const getMetricDetail = (type) => {
-    switch(type) {
+    switch (type) {
       case 'database':
         const styleStats = Object.entries(data.styles).map(([name, ideas]) => ({ name, count: ideas.length }));
         return {
@@ -119,8 +119,8 @@ const Dashboard = ({ data, channels, onViewChange, onTitleClick }) => {
           title: "Upcoming Schedule",
           content: pipeline.slice(0, 5).map(p => (
             <div key={p.id} className="detail-row">
-              <span 
-                className="title-text-interactive" 
+              <span
+                className="title-text-interactive"
                 onClick={() => onTitleClick({ ...p, sheetName: p.style })}
               >
                 {p.title}
@@ -138,8 +138,8 @@ const Dashboard = ({ data, channels, onViewChange, onTitleClick }) => {
             const style = Object.keys(data.styles).find(s => data.styles[s].some(idea => idea.id === p.id));
             return (
               <div key={p.id} className="detail-row">
-                <span 
-                  className="title-text-interactive" 
+                <span
+                  className="title-text-interactive"
                   onClick={() => onTitleClick({ ...p, sheetName: style })}
                 >
                   {p.title}
@@ -182,7 +182,7 @@ const Dashboard = ({ data, channels, onViewChange, onTitleClick }) => {
                 <span className="count-num">Day {milestoneInfo.currentDays}</span>
                 <span className="count-alt">Since Launch</span>
               </div>
-              
+
               {!milestoneInfo.completed ? (
                 <div className="milestone-progress-area">
                   <div className="milestone-objective-display">
@@ -191,25 +191,25 @@ const Dashboard = ({ data, channels, onViewChange, onTitleClick }) => {
                       <Calendar size={12} /> {niceDate(milestoneInfo.nextDate)}
                     </div>
                   </div>
-                  
+
                   <div className="milestone-progress-bar-wrapper">
                     <div className="milestone-edge-label-group">
                       <span className="milestone-edge-label">{milestoneInfo.prevLabel}</span>
                       <span className="milestone-edge-date">{niceDate(milestoneInfo.prevDate).split(', ')[1]}</span>
                     </div>
-                    
+
                     <div className="milestone-progress-bar">
                       <div className="milestone-progress-fill" style={{ width: `${milestoneInfo.percent}%` }}>
                         <div className="progress-glow"></div>
                       </div>
                     </div>
-                    
+
                     <div className="milestone-edge-label-group align-right">
                       <span className="milestone-edge-label">{milestoneInfo.nextLabel}</span>
                       <span className="milestone-edge-date">{niceDate(milestoneInfo.nextDate).split(', ')[1]}</span>
                     </div>
                   </div>
-                  
+
                   <div className="milestone-footer-row">
                     <span>{milestoneInfo.percent}% COMPLETE</span>
                     <span className="days-remaining">T-MINUS {milestoneInfo.daysLeft} DAYS</span>
@@ -228,7 +228,7 @@ const Dashboard = ({ data, channels, onViewChange, onTitleClick }) => {
       <div className="dashboard-hub-links">
         <div className="hub-link-card" onClick={() => onViewChange('prompts')}>
           <div className="hub-link-icon-wrapper">
-            <ShieldCheck size={24} />
+            <Sparkles size={24} />
           </div>
           <div className="hub-link-content">
             <div className="hub-link-title">Prompt Hub</div>
@@ -238,7 +238,7 @@ const Dashboard = ({ data, channels, onViewChange, onTitleClick }) => {
             <ChevronRight size={20} />
           </div>
         </div>
-        
+
         <div className="hub-link-card" onClick={() => onViewChange('calendar')}>
           <div className="hub-link-icon-wrapper">
             <Calendar size={24} />
@@ -278,15 +278,15 @@ const Dashboard = ({ data, channels, onViewChange, onTitleClick }) => {
             <span className="link-tag">UPLINK STATUS: ESTABLISHED</span>
             <div className="link-main">
               {data.channelLink && data.channelLink !== 'channel link NA' ? (
-                <a 
-                  href={data.channelLink} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <a
+                  href={data.channelLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="hyper-link"
                   onClick={(e) => openInNewWindow(e, data.channelLink)}
                 >
                   <Globe size={14} className="link-icon" />
-                   CHANNEL ACCESS
+                  CHANNEL ACCESS
                   <ExternalLink size={12} className="link-arrow" />
                 </a>
               ) : (
@@ -314,8 +314,8 @@ const Dashboard = ({ data, channels, onViewChange, onTitleClick }) => {
           {pipeline.slice(0, 4).map((item, idx) => (
             <div key={idx} className="pipeline-item">
               <span className="item-style" onClick={() => onViewChange('pipeline')}>{item.style}</span>
-              <span 
-                className="item-title title-text-interactive" 
+              <span
+                className="item-title title-text-interactive"
                 onClick={() => onTitleClick({ ...item, sheetName: item.style })}
               >
                 {item.title}
@@ -366,13 +366,13 @@ const Dashboard = ({ data, channels, onViewChange, onTitleClick }) => {
       {detail && (
         <div className="modal-overlay" onClick={() => setDetailMetric(null)}>
           <div className="detail-modal animate-fade" onClick={e => e.stopPropagation()}>
-             <div className="detail-header">
-               <span>{detail.title}</span>
-               <button className="close-detail" onClick={() => setDetailMetric(null)}>×</button>
-             </div>
-             <div className="detail-content">
-               {detail.content}
-             </div>
+            <div className="detail-header">
+              <span>{detail.title}</span>
+              <button className="close-detail" onClick={() => setDetailMetric(null)}>×</button>
+            </div>
+            <div className="detail-content">
+              {detail.content}
+            </div>
           </div>
         </div>
       )}
@@ -381,10 +381,10 @@ const Dashboard = ({ data, channels, onViewChange, onTitleClick }) => {
 };
 
 const App = () => {
-  const [data, setData] = useState({ 
-    prompts: { audio: '', script: '', description: '', thumbnail: '', shorts: '' }, 
-    styles: {}, 
-    channelLink: 'channel link NA' 
+  const [data, setData] = useState({
+    prompts: { audio: '', script: '', description: '', thumbnail: '', shorts: '' },
+    styles: {},
+    channelLink: 'channel link NA'
   });
   const [view, setView] = useState('dashboard'); // 'dashboard', 'prompts', 'style', 'calendar', 'pipeline'
   const [selectedStyle, setSelectedStyle] = useState(null);
@@ -426,9 +426,9 @@ const App = () => {
         .from('channels')
         .select('name')
         .order('name');
-      
+
       if (error) throw error;
-      
+
       const channelNames = list.map(c => c.name);
       setChannels(channelNames);
       if (channelNames.length > 0) {
@@ -464,14 +464,14 @@ const App = () => {
   const fetchData = async (channelName) => {
     try {
       setLoading(true);
-      
+
       // 1. Get Channel Data
       const { data: channelData, error: channelError } = await supabase
         .from('channels')
         .select('*')
         .eq('name', channelName)
         .single();
-      
+
       if (channelError) throw channelError;
 
       // 2. Get Styles and Ideas
@@ -482,7 +482,7 @@ const App = () => {
           ideas (*)
         `)
         .eq('channel_id', channelData.id);
-      
+
       if (stylesError) throw stylesError;
 
       const formattedStyles = {};
@@ -526,7 +526,7 @@ const App = () => {
         .from('ideas')
         .update({ completed: status })
         .eq('id', rowId);
-      
+
       if (error) throw error;
     } catch (err) {
       console.error('Failed to update status:', err);
@@ -546,7 +546,7 @@ const App = () => {
         .from('ideas')
         .update({ date: date || null })
         .eq('id', rowId);
-      
+
       if (error) throw error;
     } catch (err) {
       console.error('Failed to update date:', err);
@@ -566,7 +566,7 @@ const App = () => {
         .from('ideas')
         .update({ links: links })
         .eq('id', rowId);
-      
+
       if (error) throw error;
     } catch (err) {
       console.error('Failed to update links:', err);
@@ -621,8 +621,8 @@ const App = () => {
           <h2>Supabase Connection Issue</h2>
           <p>{error}</p>
           <div style={{ display: 'flex', gap: '10px' }}>
-             <button className="copy-btn" onClick={() => window.location.reload()}>Retry</button>
-             <button className="copy-btn" onClick={handleLogout}>Sign Out</button>
+            <button className="copy-btn" onClick={() => window.location.reload()}>Retry</button>
+            <button className="copy-btn" onClick={handleLogout}>Sign Out</button>
           </div>
         </div>
       </div>
@@ -738,8 +738,8 @@ const App = () => {
               <div style={{ marginBottom: '4px' }}>
                 Progress: {Object.values(data.styles).flat().filter(i => i.completed).length} / {Object.values(data.styles).flat().length} Done
               </div>
-              <button 
-                className="copy-btn" 
+              <button
+                className="copy-btn"
                 style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                 onClick={handleLogout}
               >
@@ -932,8 +932,8 @@ const App = () => {
                                 setDatePickerIdea({ ...idea, sheetName: idea.sheetName || selectedStyle });
                               }}
                             />
-                            <span 
-                              className="title-text-interactive" 
+                            <span
+                              className="title-text-interactive"
                               onClick={() => setLinksIdea({ ...idea, sheetName: idea.sheetName || selectedStyle })}
                               title="Click to view/add links"
                             >
@@ -941,7 +941,7 @@ const App = () => {
                             </span>
                             {idea.date && <span className="date-badge">{niceDate(idea.date)}</span>}
                             {idea.links && idea.links.length > 0 && (
-                                <ExternalLink size={12} style={{ color: 'var(--primary)', opacity: 0.7 }} />
+                              <ExternalLink size={12} style={{ color: 'var(--primary)', opacity: 0.7 }} />
                             )}
                             <Copy
                               size={14}
@@ -1300,14 +1300,14 @@ const LinksPopup = ({ idea, onClose, onUpdate }) => {
     <div className="date-picker-overlay" onClick={onClose}>
       <div className="calendar-ui" style={{ width: '400px' }} onClick={e => e.stopPropagation()}>
         <div className="calendar-header">
-           <h3 style={{ fontFamily: 'Outfit' }}>Video Links</h3>
-           <button className="collapse-btn" onClick={onClose}>×</button>
+          <h3 style={{ fontFamily: 'Outfit' }}>Video Links</h3>
+          <button className="collapse-btn" onClick={onClose}>×</button>
         </div>
         <div style={{ marginBottom: '1.5rem' }}>
           <p style={{ fontSize: '0.9rem', fontWeight: 700, margin: '0 0 4px 0', color: 'var(--primary)' }}>{idea.title}</p>
           <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>Manage references and project links</p>
         </div>
-        
+
         <div className="links-list" style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: '1.5rem', paddingRight: '4px' }}>
           {links.length === 0 ? (
             <div style={{ padding: '2rem', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px dashed var(--border)' }}>
@@ -1316,10 +1316,10 @@ const LinksPopup = ({ idea, onClose, onUpdate }) => {
           ) : (
             links.map((link, idx) => (
               <div key={idx} className="link-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', marginBottom: '8px', border: '1px solid var(--border)' }}>
-                <a 
-                  href={link.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{ color: 'var(--primary)', textDecoration: 'none', fontSize: '0.85rem', flex: 1, marginRight: '8px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 600 }}
                   onClick={(e) => openInNewWindow(e, link.url)}
                 >
@@ -1333,18 +1333,18 @@ const LinksPopup = ({ idea, onClose, onUpdate }) => {
 
         <div className="add-link-form" style={{ display: 'flex', flexDirection: 'column', gap: '10px', background: 'rgba(255,102,0,0.03)', padding: '12px', borderRadius: '12px', border: '1px solid var(--border)' }}>
           <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px' }}>Add New Link</div>
-          <input 
-            type="text" 
-            placeholder="Link Name (e.g. Canva, YouTube)" 
-            value={newLinkName} 
+          <input
+            type="text"
+            placeholder="Link Name (e.g. Canva, YouTube)"
+            value={newLinkName}
             onChange={e => setNewLinkName(e.target.value)}
             className="custom-input"
           />
           <div style={{ display: 'flex', gap: '8px' }}>
-            <input 
-              type="text" 
-              placeholder="https://..." 
-              value={newLinkUrl} 
+            <input
+              type="text"
+              placeholder="https://..."
+              value={newLinkUrl}
               onChange={e => setNewLinkUrl(e.target.value)}
               className="custom-input"
               style={{ flex: 1 }}
