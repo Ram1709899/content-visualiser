@@ -19,7 +19,8 @@ import {
   Music,
   AlertCircle,
   Clock,
-  ExternalLink
+  ExternalLink,
+  Command
 } from 'lucide-react';
 
 const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
