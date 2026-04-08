@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
-import { 
-  Sparkles, 
-  History, 
-  Plus, 
-  Save, 
-  CheckCircle2, 
-  Play, 
-  Trash2, 
-  ChevronRight, 
-  ChevronDown, 
-  Edit3, 
-  Copy, 
-  MessageSquare, 
-  Radio, 
-  PenTool, 
-  Video, 
+import {
+  Sparkles,
+  History,
+  Plus,
+  Save,
+  CheckCircle2,
+  Play,
+  Trash2,
+  ChevronRight,
+  ChevronDown,
+  Edit3,
+  Copy,
+  MessageSquare,
+  Radio,
+  PenTool,
+  Video,
   Music,
   AlertCircle,
   Clock,
@@ -65,7 +65,7 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
       if (error) throw error;
 
       setVersions(data || []);
-      
+
       const active = data?.find(v => v.is_active);
       if (active) {
         setSelectedVersionId(active.id);
@@ -91,12 +91,12 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
           created_at: new Date().toISOString(),
           is_virtual: true
         };
-        
+
         // Add to versions if it's empty to show it in sidebar
         if (!data || data.length === 0) {
           setVersions([virtualVersion]);
         }
-        
+
         setSelectedVersionId('live-system');
         setEditForm(virtualVersion);
       }
@@ -125,7 +125,6 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
   };
 
   const handleCreateNew = () => {
-    setSelectedVersionId(null);
     setEditForm({
       name: `v${versions.length + 1} - ${new Date().toLocaleDateString()}`,
       audio: '',
@@ -180,7 +179,7 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
   const handleSetActive = async (id) => {
     try {
       setSaving(true);
-      
+
       // 1. Mark all as inactive for this channel
       await supabase
         .from('prompt_versions')
@@ -251,9 +250,9 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
           </p>
         </div>
         <div className="hub-actions">
-           <button className="copy-btn" onClick={handleCreateNew} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-             <Plus size={16} /> NEW ARCHIVE
-           </button>
+          <button className="copy-btn" onClick={handleCreateNew} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Plus size={16} /> NEW ARCHIVE
+          </button>
         </div>
       </div>
 
@@ -265,8 +264,8 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
           </div>
           <div className="version-list">
             {versions.map(v => (
-              <div 
-                key={v.id} 
+              <div
+                key={v.id}
                 className={`version-item ${selectedVersionId === v.id ? 'active' : ''} ${v.is_active ? 'working' : ''}`}
                 onClick={() => handleSelectVersion(v)}
               >
@@ -288,15 +287,15 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
           {isEditing || !selectedVersionId ? (
             <div className="prompt-editor animate-fade">
               <div className="editor-header">
-                <input 
-                  className="version-name-input" 
-                  value={editForm.name} 
-                  onChange={e => setEditForm({...editForm, name: e.target.value})}
+                <input
+                  className="version-name-input"
+                  value={editForm.name}
+                  onChange={e => setEditForm({ ...editForm, name: e.target.value })}
                   placeholder="Version Name (e.g. Optimized v2.1)"
                 />
                 <div style={{ display: 'flex', gap: '10px' }}>
-                  <button className="copy-btn" onClick={() => setIsEditing(false)} disabled={!selectedVersionId}>CANCEL</button>
-                  <button className="google-login-btn" style={{ height: '40px', padding: '0 20px' }} onClick={() => handleSave(selectedVersionId === null)}>
+                  <button className="copy-btn" onClick={() => setIsEditing(false)}>CANCEL</button>
+                  <button className="google-login-btn" style={{ height: '40px', padding: '0 20px' }} onClick={() => handleSave(!selectedVersionId || selectedVersionId === 'live-system')}>
                     <Save size={16} /> {saving ? 'SAVING...' : 'SAVE VERSION'}
                   </button>
                 </div>
@@ -308,10 +307,10 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
                     <div className="field-label" style={{ color: type.color }}>
                       {type.icon} {type.label}
                     </div>
-                    <textarea 
-                      className="field-textarea" 
-                      value={editForm[type.key]} 
-                      onChange={e => setEditForm({...editForm, [type.key]: e.target.value})}
+                    <textarea
+                      className="field-textarea"
+                      value={editForm[type.key]}
+                      onChange={e => setEditForm({ ...editForm, [type.key]: e.target.value })}
                       placeholder={`Enter ${type.label.toLowerCase()} prompt here...`}
                     />
                   </div>
@@ -320,65 +319,71 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
             </div>
           ) : (
             <div className="prompt-viewer animate-fade">
-              <div className="viewer-header">
-                <div className="viewer-info">
-                  <h2>{selectedVersion.name}</h2>
-                  <span className="timestamp">ARCHIVED ON {new Date(selectedVersion.created_at).toLocaleString()}</span>
-                </div>
-                <div className="viewer-actions">
-                  <button className="copy-btn" onClick={() => setIsEditing(true)}>
-                    <Edit3 size={16} /> CLONE TO NEW VERSION
-                  </button>
-                  {selectedVersion.is_virtual ? (
-                    <div className="active-badge" style={{ position: 'static', padding: '8px 16px', fontSize: '0.8rem' }}>
-                      <Play size={14} /> LIVE SYSTEM ACTIVE
+              {!selectedVersion ? (
+                <div className="loader">SELECT A VERSION TO VIEW</div>
+              ) : (
+                <>
+                  <div className="viewer-header">
+                    <div className="viewer-info">
+                      <h2>{selectedVersion.name}</h2>
+                      <span className="timestamp">ARCHIVED ON {new Date(selectedVersion.created_at).toLocaleString()}</span>
                     </div>
-                  ) : (
-                    <button 
-                      className={`google-login-btn ${selectedVersion.is_active ? 'disabled' : ''}`} 
-                      style={{ height: '40px', padding: '0 20px' }}
-                      onClick={() => handleSetActive(selectedVersion.id)}
-                      disabled={selectedVersion.is_active || saving}
-                    >
-                      <Play size={16} /> {selectedVersion.is_active ? 'CURRENT WORKING' : 'DEPLOY AS WORKING'}
-                    </button>
-                  )}
-                </div>
-              </div>
+                    <div className="viewer-actions">
+                      <button className="copy-btn" onClick={() => setIsEditing(true)}>
+                        <Edit3 size={16} /> CLONE TO NEW VERSION
+                      </button>
+                      {selectedVersion.is_virtual ? (
+                        <div className="active-badge" style={{ position: 'static', padding: '8px 16px', fontSize: '0.8rem' }}>
+                          <Play size={14} /> LIVE SYSTEM ACTIVE
+                        </div>
+                      ) : (
+                        <button
+                          className={`google-login-btn ${selectedVersion.is_active ? 'disabled' : ''}`}
+                          style={{ height: '40px', padding: '0 20px' }}
+                          onClick={() => handleSetActive(selectedVersion.id)}
+                          disabled={selectedVersion.is_active || saving}
+                        >
+                          <Play size={16} /> {selectedVersion.is_active ? 'CURRENT WORKING' : 'DEPLOY AS WORKING'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
 
-              <div className="professional-prompt-workspace">
-                <div className="prompt-category-selector">
-                  {promptTypes.map(type => (
-                    <div 
-                      key={type.key} 
-                      className={`category-item ${activePromptCategory === type.key ? 'active' : ''}`}
-                      onClick={() => setActivePromptCategory(type.key)}
-                      style={{ '--accent': type.color }}
-                    >
-                      <div className="category-icon">{type.icon}</div>
-                      <div className="category-info">
-                        <span className="category-label">{type.label}</span>
-                        <span className="category-status">Establish Ready</span>
+                  <div className="professional-prompt-workspace">
+                    <div className="prompt-category-selector">
+                      {promptTypes.map(type => (
+                        <div
+                          key={type.key}
+                          className={`category-item ${activePromptCategory === type.key ? 'active' : ''}`}
+                          onClick={() => setActivePromptCategory(type.key)}
+                          style={{ '--accent': type.color }}
+                        >
+                          <div className="category-icon">{type.icon}</div>
+                          <div className="category-info">
+                            <span className="category-label">{type.label}</span>
+                            <span className="category-status">Establish Ready</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="prompt-display-area animate-fade" key={activePromptCategory}>
+                      <div className="display-header">
+                        <div className="display-title" style={{ color: promptTypes.find(t => t.key === activePromptCategory)?.color }}>
+                          {promptTypes.find(t => t.key === activePromptCategory)?.icon}
+                          {promptTypes.find(t => t.key === activePromptCategory)?.label}
+                        </div>
+                        <button className="copy-btn" onClick={() => handleCopy(selectedVersion[activePromptCategory], activePromptCategory)}>
+                          <Copy size={16} /> COPY TO CLIPBOARD
+                        </button>
+                      </div>
+                      <div className="display-body">
+                        {selectedVersion[activePromptCategory] || <span style={{ opacity: 0.3 }}>No architectural data established for this category.</span>}
                       </div>
                     </div>
-                  ))}
-                </div>
-
-                <div className="prompt-display-area animate-fade" key={activePromptCategory}>
-                  <div className="display-header">
-                    <div className="display-title" style={{ color: promptTypes.find(t => t.key === activePromptCategory)?.color }}>
-                      {promptTypes.find(t => t.key === activePromptCategory)?.icon}
-                      {promptTypes.find(t => t.key === activePromptCategory)?.label}
-                    </div>
-                    <button className="copy-btn" onClick={() => handleCopy(selectedVersion[activePromptCategory], activePromptCategory)}>
-                      <Copy size={16} /> COPY TO CLIPBOARD
-                    </button>
                   </div>
-                  <div className="display-body">
-                    {selectedVersion[activePromptCategory] || <span style={{ opacity: 0.3 }}>No architectural data established for this category.</span>}
-                  </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -391,7 +396,8 @@ const PromptHub = ({ channelData, onUpdateActivePrompts }) => {
         </div>
       )}
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .prompt-hub-container { height: 100%; display: flex; flex-direction: column; }
         .hub-layout { display: grid; grid-template-columns: 280px 1fr; gap: 2rem; flex: 1; min-height: 0; }
         .hub-sidebar { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; }
